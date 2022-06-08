@@ -1,27 +1,34 @@
 const express = require('express');
 const router = express.Router();
-// const UserModel= require("../models/userModel.js")
-const UserController= require("../controllers/userController")
-const BookController= require("../controllers/bookController")
+const authorModel = require("../models/authorModel")
+const authorController = require("../controllers/authorController")
+const booksController = require('../controllers/booksController')
 
-router.get("/test-me", function (req, res) {
-    res.send("My first ever api!")
+
+router.get('/test-me', function(req,res){
+    res.send("My first API")
 })
 
-router.post("/createUser", UserController.createUser  )
+// *******AUTHORS*********
 
-router.get("/getUsersData", UserController.getUsersData)
+router.post('/createAuthor', authorController.createAuthor)
 
-router.post("/createBook", BookController.createBook  )
+router.get("/authorData", authorController.authorData)
 
-router.get("/getBooksData", BookController.getBooksData)
+// ********BOOKS***********
 
-router.post("/updateBooks", BookController.updateBooks)
-router.post("/deleteBooks", BookController.deleteBooks)
+router.post('/createBooks' ,booksController.createBooks)
 
-//MOMENT JS
+router.get('/booksData', booksController.booksData )
+
+
+//MOMENT 
 const moment = require('moment');
-router.get("/dateManipulations", function (req, res) {
+router.get("/dateManipulations", function (req, res){
+
+
+
+
     
     // const today = moment();
     // let x= today.add(10, "days")
