@@ -8,10 +8,13 @@ const booksModel = require("../models/booksModel")
     res.send ({msg : saveData})}
  
     const booksData = async function(req ,res){
-        let allBooks = await booksModel.find({sales:{$eq:10}}).skip(3*page-1).limit(3)
+        let allBooks = await booksModel.findOneAndUpdate({name : "Two States"} ,{ price : 100})
+    
         res.send({msg : allBooks})}
 
-
+    const priceBetweenBooks =async function(req,res){
+        let allBooks = await booksModel.find({$or: [{price : {$gt :50}} , { price: {$lt : 100}}]})
+    }
 module.exports.createBooks = createBooks
 module.exports.booksData = booksData
 
