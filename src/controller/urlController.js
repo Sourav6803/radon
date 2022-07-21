@@ -34,16 +34,16 @@ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 const createUrl = async function (req, res) {
   try {
     const longUrl = req.body.longUrl
-       //If URL already Present
-       let cachedLongUrl = await GET_ASYNC(`${longUrl}`)
-       if(cachedLongUrl){
+    //If URL already Present
+    let cachedLongUrl = await GET_ASYNC(`${longUrl}`)
+    if (cachedLongUrl) {
 
-           let parseLongUrl = JSON.parse(cachedLongUrl)
-           return res.status(200).send({status:true,message: "Shorten link already generated ", data:parseLongUrl})
-       }
+      let parseLongUrl = JSON.parse(cachedLongUrl)
+      return res.status(200).send({ status: true, message: "Shorten link already generated ", data: parseLongUrl })
+    }
 
-    if(Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "please enter long url"})
-   
+    if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "please enter long url" })
+
     if (!validUrl.isUri(longUrl)) {
       return res.status(400).send({ status: false, message: "invalid URL" })
     }
@@ -58,19 +58,19 @@ const createUrl = async function (req, res) {
     //   return res.status(200).send({ status: true, message: "url is already genrated", data: save })
     // }
 
-     const str = 'http://localhost:3000/'
+    const str = 'http://localhost:3000/'
     // const str = req.protocol+"://"+req.headers.host +"/";
-   
+
     const urlCode = shortid.generate()
     const shortUrl = str + urlCode
 
     const urlData = { longUrl, shortUrl, urlCode }
 
     //Set cache the newly created url
-    if(urlData){
-               
-      await SET_ASYNC(`${longUrl}`,JSON.stringify(urlData))
-  }
+    if (urlData) {
+
+      await SET_ASYNC(`${longUrl}`, JSON.stringify(urlData))
+    }
     const savedData = await urlModel.create(urlData)
 
     return res.status(201).send({ status: true, message: "success", data: urlData })
@@ -93,23 +93,18 @@ const getUrl = async function (req, res) {
     let cachedUrlCode = await GET_ASYNC(`${urlCode}`)
 
     if (cachedUrlCode) {
-    
-        let parseUrl = JSON.parse(cachedUrlCode)
-        let cachedLongUrl = parseUrl.longUrl
-        return res.status(302).redirect(cachedLongUrl)
+      let parseUrl = JSON.parse(cachedUrlCode)
+      let cachedLongUrl = parseUrl.longUrl
+      return res.status(302).redirect(cachedLongUrl)//.send({status:true ,msg: 'coming from cache data', data:cachedLongUrl })
     }
-
 
     if (!shortid.isValid(urlCode)) { return res.status(400).send({ status: false, message: "invalid URL" }) }
 
     const getUrl = await urlModel.findOne({ urlCode });
-
     if (!getUrl) { return res.status(404).send({ status: false, message: "URL not found" }) }
 
     await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl))
-
-    return res.status(302).redirect(getUrl.longUrl)
-
+    return res.status(302).redirect(getUrl.longUrl)//.send({status:true , data: getUrl})
   }
   catch (err) {
     return res.status(500).send({ status: false, message: err.message })
